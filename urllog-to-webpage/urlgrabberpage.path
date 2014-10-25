@@ -1,0 +1,10 @@
+[Unit]
+Description=regenerate page on new url
+
+[Path]
+# would be cool to have this passed to the Unit= unit
+# templating is not elegant enough in this case
+PathModified=/home/zdzichu/.irssi/urllog
+
+[Install]
+WantedBy=default.target

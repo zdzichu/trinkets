@@ -1,0 +1,10 @@
+[Unit]
+Description=turns IRC urllog into nice page
+
+[Service]
+Environment=http_proxy=http://mother.pipebreaker.pl:8080
+Environment=https_proxy=http://mother.pipebreaker.pl:8080
+Type=oneshot
+ExecStart=/home/zdzichu/bin/urlgrab-to-page.py
+#PrivateTmp=yes
+#PrivateNetwork=yes
