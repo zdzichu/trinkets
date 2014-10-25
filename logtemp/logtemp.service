@@ -1,0 +1,13 @@
+[Unit]
+Description=database logging of temperature from OWFS
+#RequiresMountsFor=/run/owfs
+#After=postgresql.service, owfs.service
+
+[Service]
+Type=notify
+ExecStart=/home/zdzichu/bin/logtemp.py
+WatchdogSec=2m
+Restart=always
+
+[Install]
+WantedBy=default.target
