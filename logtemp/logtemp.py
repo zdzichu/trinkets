@@ -10,7 +10,7 @@ import psycopg2
 import systemd.daemon
 import time
 
-sleep_seconds = 60 # make sure to be less than WatchdogSec=
+sleep_seconds = int(os.getenv("WATCHDOG_USEC")) / (2*(10**6)) + 1
 
 systemd.daemon.notify("STATUS=Opening DB connection...")
 try:

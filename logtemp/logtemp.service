@@ -6,6 +6,7 @@ Description=database logging of temperature from OWFS
 [Service]
 Type=notify
 ExecStart=/home/zdzichu/bin/logtemp.py
+# temperature is read & stored every half of watchdog interval
 WatchdogSec=2m
 Restart=always
 
