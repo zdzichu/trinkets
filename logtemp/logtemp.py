@@ -18,7 +18,6 @@ try:
 except Exception, e:
 	print "Error connecting to DB, sorry: %s" % e
 	exit(1)
-dbconn.autocommit=True
 cur = dbconn.cursor()
 cur.execute("PREPARE put_temperature AS INSERT INTO temperatures (datetime, sensor_id, value) VALUES (NOW(), (SELECT id FROM sensors WHERE SN=$1), $2);")
 
@@ -38,6 +37,7 @@ while True:
 			cur.execute("INSERT INTO sensors (SN) VALUES (%s)", (SN,))
 			cur.execute("EXECUTE put_temperature (%s, %s);", (SN, temperature) )
 
+	dbconn.commit()
 	systemd.daemon.notify("STATUS=Sleeping until %s" % time.ctime(time.time() + sleep_seconds))
 	systemd.daemon.notify("WATCHDOG=1")
 	time.sleep(sleep_seconds)
