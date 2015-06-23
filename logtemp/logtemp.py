@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 #
 # logs temperature from OWFS into postgres database
 # (c) Tomasz Torcz, ISC License
@@ -15,8 +15,8 @@ sleep_seconds = int(os.getenv("WATCHDOG_USEC")) / (2*(10**6)) + 1
 systemd.daemon.notify("STATUS=Opening DB connection...")
 try:
 	dbconn = psycopg2.connect("dbname=temperature_log")
-except Exception, e:
-	print "Error connecting to DB, sorry: %s" % e
+except Exception as err:
+	print("Error connecting to DB, sorry: {0}".format(err))
 	exit(1)
 cur = dbconn.cursor()
 cur.execute("PREPARE put_temperature AS INSERT INTO temperatures (datetime, sensor_id, value) VALUES (NOW(), (SELECT id FROM sensors WHERE SN=$1), $2);")
@@ -33,7 +33,7 @@ while True:
 		try:
 			cur.execute("EXECUTE put_temperature (%s, %s);", (SN, temperature) )
 		except psycopg2.IntegrityError:
-			print "New sensor %s! Adding to database, please correct description." % SN
+			print("New sensor {0}! Adding to database, please correct description." % SN)
 			cur.execute("INSERT INTO sensors (SN) VALUES (%s)", (SN,))
 			cur.execute("EXECUTE put_temperature (%s, %s);", (SN, temperature) )
 
