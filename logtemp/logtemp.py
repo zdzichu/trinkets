@@ -33,8 +33,9 @@ while True:
 		try:
 			cur.execute("EXECUTE put_temperature (%s, %s);", (SN, temperature) )
 		except psycopg2.IntegrityError:
-			print("New sensor {0}! Adding to database, please correct description." % SN)
-			cur.execute("INSERT INTO sensors (SN) VALUES (%s)", (SN,))
+			print("New sensor {0}! Adding to database, please correct description.".format(SN) )
+			dbconn.rollback()
+			cur.execute("INSERT INTO sensors (SN) VALUES ('{0}')".format(SN) )
 			cur.execute("EXECUTE put_temperature (%s, %s);", (SN, temperature) )
 
 	dbconn.commit()
