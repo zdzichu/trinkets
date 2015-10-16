@@ -64,7 +64,8 @@ outfile = open(OUTPAGE, "w")
 
 outfile.write("<!DOCTYPE html>\n")
 outfile.write("<html><head><title>urlz for lulz: %s</title>\n" % datetime.datetime.now() )
-outfile.write("<meta charset='utf-8'><meta http-equiv='refresh' content='300' ></head>\n<body>\n") 
+outfile.write("<meta charset='utf-8'><meta http-equiv='refresh' content='300' ></head>\n")
+outfile.write("<body style=\"font-family: Cantarell\">\n")
 
 for line in grabbed_urls:
 	(timestamp, nick, channel, url) = line.split(" ")
