@@ -11,3 +11,6 @@ CREATE TABLE temperatures (
 	sensor_id	int NOT NULL,
 	value	double precision
 );
+
+CREATE INDEX idx_timestamp ON temperatures(datetime);
+CREATE INDEX idx_sensors ON temperatures(sensor_id);
