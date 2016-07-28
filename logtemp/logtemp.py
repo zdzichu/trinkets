@@ -3,17 +3,18 @@
 # logs temperature from OWFS into postgres database
 # (c) Tomasz Torcz, ISC License
 
-import glob
 import os
-
 import psycopg2
 import systemd.daemon
 import time
 
+from pyownet.protocol import proxy
+
 sleep_seconds = int(os.getenv("WATCHDOG_USEC")) / (2*(10**6)) + 1
 
-systemd.daemon.notify("STATUS=Opening DB connection...")
+systemd.daemon.notify("STATUS=Opening owserver & DB connection...")
 try:
+	owproxy = proxy()
 	dbconn = psycopg2.connect("dbname=temperature_log")
 except Exception as err:
 	print("Error connecting to DB, sorry: {0}".format(err))
@@ -24,13 +25,17 @@ cur.execute("PREPARE put_temperature AS INSERT INTO temperatures (datetime, sens
 systemd.daemon.notify("READY=1")
 systemd.daemon.notify("STATUS=Entering main loop")
 while True:
-	for SN in glob.glob("/run/owfs/??.????????????"):
+	for owitem in owproxy.dir(slash=False):
+		if not owproxy.present("%s/temperature" % owitem):
+		    # not a temperature sensor, skip it
+		    continue
+
+		SN = owitem[1:] # /slash be gone
 		systemd.daemon.notify("STATUS=Reading sensor %s..." % SN)
-		temperature = open("%s/temperature" % SN).readline()
-		# we won't be needing full path anymore, trim it
-		SN = os.path.basename(SN)
+		temperature = float(owproxy.read("%s/temperature" % owitem))
 
 		try:
+			print("EXECUTE put_temperature (%s, %s);", (SN, temperature) )
 			cur.execute("EXECUTE put_temperature (%s, %s);", (SN, temperature) )
 		except psycopg2.IntegrityError:
 			print("New sensor {0}! Adding to database, please correct description.".format(SN) )
