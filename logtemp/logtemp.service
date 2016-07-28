@@ -1,7 +1,6 @@
 [Unit]
 Description=database logging of temperature from OWFS
-#RequiresMountsFor=/run/owfs
-#After=postgresql.service, owfs.service
+#After=postgresql.service, owserver.socket
 
 [Service]
 Type=notify
