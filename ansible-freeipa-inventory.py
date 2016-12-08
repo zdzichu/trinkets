@@ -46,7 +46,7 @@ if __name__ == "__main__":
 	api.bootstrap(context='iparest')
 	api.finalize()
 
-	api.Backend.xmlclient.connect()
+	api.Backend.rpcclient.connect()
 
 	if len(sys.argv) == 2 and (sys.argv[1] == "--list"):
 		groups_find(api)
