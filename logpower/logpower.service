@@ -1,0 +1,13 @@
+[Unit]
+Description=database logging of temperature from OWFS
+#After=postgresql.service, owserver.socket
+
+[Service]
+Type=notify
+ExecStart=/home/zdzichu/bin/logtemp.py
+# temperature is read & stored every half of watchdog interval
+WatchdogSec=2m
+Restart=always
+
+[Install]
+WantedBy=default.target
