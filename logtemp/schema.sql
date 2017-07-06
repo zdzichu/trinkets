@@ -1,7 +1,7 @@
 
 CREATE TABLE sensors (
 	id	serial PRIMARY KEY,
-	SN	varchar(15) NOT NULL, -- serial number
+	SN	varchar(16) NOT NULL, -- serial number; 15 for onewire, but Raspi got 16 chars
 	description	varchar
 );
 
