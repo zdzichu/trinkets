@@ -38,10 +38,10 @@ cur.execute("PREPARE put_temperature AS INSERT INTO temperatures (datetime, sens
 # PREPARE REGEXPES
 # adapted from https://github.com/openhab/openhab1-addons/blob/master/bundles/binding/org.openhab.binding.dsmr/src/main/java/org/openhab/binding/dsmr/internal/messages/OBISIdentifier.java#L23
 obis_regexp = re.compile(
-        "^((?P<group_a>\d)-(?P<group_b>\d{1,2}):)?"
-        "(?P<group_c>\w{1,2})\.(?P<group_d>\w{1,2})"
-        "(\.(?P<group_e>\d+)(\*(?P<group_f>\d{1,3}))?)?"
-        "\((?P<data>.+)\)!?$" )
+        "^((?P<group_a>\d)-(?P<group_b>\d{1,2}):)?"       # 1-2:   - optional group of digit + 1 or 2 digits
+        "(?P<group_c>\w{1,2})\.(?P<group_d>\w{1,2})"      # 3.4    - required group of 1 or 2 alphanumerics + 1 or 2 alphanumeric
+        "(\.(?P<group_e>\d+)(\*(?P<group_f>\d{1,3}))?)?"  # .5*6   - optional group of digit + optional 1 to 3 digits
+        "\((?P<data>.+)\)!?$" )                           # ( )    - required group of data in parens, with optional exclamation mark
 
 systemd.daemon.notify("READY=1")
 systemd.daemon.notify("STATUS=Entering main loop")
