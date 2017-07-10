@@ -15,7 +15,7 @@ sleep_seconds = int(os.getenv("WATCHDOG_USEC")) / (2*(10**6)) + 1
 systemd.daemon.notify("STATUS=Opening owserver & DB connection...")
 try:
 	owproxy = proxy()
-	dbconn = psycopg2.connect("dbname=temperature_log")
+	dbconn = psycopg2.connect("dbname=house_metrics")
 except Exception as err:
 	print("Error connecting to DB, sorry: {0}".format(err))
 	exit(1)
@@ -35,12 +35,11 @@ while True:
 		temperature = float(owproxy.read("%s/temperature" % owitem))
 
 		try:
-			print("EXECUTE put_temperature (%s, %s);", (SN, temperature) )
 			cur.execute("EXECUTE put_temperature (%s, %s);", (SN, temperature) )
 		except psycopg2.IntegrityError:
 			print("New sensor {0}! Adding to database, please correct description.".format(SN) )
 			dbconn.rollback()
-			cur.execute("INSERT INTO sensors (SN) VALUES ('{0}')".format(SN) )
+			cur.execute("INSERT INTO sensors (SN) VALUES (%s)", (SN) )
 			cur.execute("EXECUTE put_temperature (%s, %s);", (SN, temperature) )
 
 	dbconn.commit()
