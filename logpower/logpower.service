@@ -1,12 +1,12 @@
 [Unit]
-Description=database logging of temperature from OWFS
+Description=database logging of power meter readouts
 #After=postgresql.service, owserver.socket
 
 [Service]
 Type=notify
-ExecStart=/home/zdzichu/bin/logtemp.py
-# temperature is read & stored every half of watchdog interval
-WatchdogSec=2m
+ExecStart=/usr/local/bin/logtemp.py
+# measurements is read & stored every half of watchdog interval
+WatchdogSec=12m
 Restart=always
 
 [Install]

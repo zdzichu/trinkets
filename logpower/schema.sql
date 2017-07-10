@@ -1,7 +1,7 @@
 
 CREATE TABLE measurements (
 	m_id	serial PRIMARY KEY,
-	m_datetime	timestamp with time zone NOT NULL DEFAULT NOW(),
+	m_datetime	timestamp with time zone NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE power_measurements_items (
@@ -13,11 +13,11 @@ CREATE TABLE power_measurements_items (
 	pmi_group_b_channel	varchar(1) DEFAULT NULL,
 	pmi_group_c_type	varchar(2) NOT NULL,
 	pmi_group_d_variable	varchar(2) NOT NULL,
-	pmi_group_e_tariff	varchar(1) DEFAULT NULL,
+	pmi_group_e_tariff	varchar(2) DEFAULT NULL,
 	pmi_group_f_historical	varchar(2) DEFAULT NULL,
-	-- 32 value + * + 16 unit
+	-- 32 value + * + 16 unit, although I've seen additional fields adding aup to 63
 	-- in mode C up to 128bytes, but we ignore it now
-	pmi_data	varchar(49)
+	pmi_data	varchar(64)
 );
 
 
