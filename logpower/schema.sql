@@ -24,8 +24,20 @@ CREATE TABLE power_measurements_items (
 CREATE INDEX idx_m_datetime ON measurements USING BRIN(m_datetime);
 CREATE INDEX idx_pmi_mid ON power_measurements_items(pmi_measurement_id);
 
-/* view kwh consumed z 1.8.0 ? 8?
+-- create delta (in Watts) view for 1.8.0*00  (01,02 are historical values)
+-- m2 - current measurement, m1 - previous measurement
+CREATE VIEW v_power_delta AS SELECT m2.m_datetime, '1.8.0*00' AS field,
+	( (pmi2.pmi_data::float - pmi1.pmi_data::float) / (EXTRACT(EPOCH FROM m2.m_datetime) - EXTRACT(EPOCH FROM m1.m_datetime)) ) * 1000 AS delta
+	FROM power_measurements_items AS pmi1, power_measurements_items AS pmi2, measurements AS m1, measurements AS m2
+	-- find previous measuremnts and its items
+	WHERE m1.m_id = (SELECT m_id FROM measurements WHERE m_id < m2.m_id ORDER BY m_datetime DESC LIMIT 1)
+	AND pmi2.pmi_measurement_id = m2.m_id AND pmi1.pmi_measurement_id = (SELECT m_id FROM measurements WHERE m_id < m2.m_id ORDER BY m_datetime DESC LIMIT 1)
+	-- match groups in first and second measurement
+	AND pmi1.pmi_group_c_type = '1'      AND pmi2.pmi_group_c_type = '1'
+	AND pmi1.pmi_group_d_variable = '8'  AND pmi2.pmi_group_d_variable = '8'
+	AND pmi1.pmi_group_e_tariff = '0'    AND pmi2.pmi_group_e_tariff='0'
+	AND pmi1.pmi_group_f_historical='00' AND pmi2.pmi_group_f_historical='00';
 
-
+/*
 CREATE INDEX idx_timestamp ON temperatures(datetime);
-CREATE INDEX idx_sensors ON temperatures(sensor_id); /*
+CREATE INDEX idx_sensors ON temperatures(sensor_id); */
