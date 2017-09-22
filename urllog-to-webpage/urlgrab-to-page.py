@@ -12,6 +12,10 @@ import shelve
 import time
 import xdg.BaseDirectory
 
+import sys
+reload(sys)
+sys.setdefaultencoding('utf8')
+
 from mechanize import Browser
 
 # great, simple script got caching support
