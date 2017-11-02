@@ -15,10 +15,16 @@ sleep_seconds = int(os.getenv("WATCHDOG_USEC")) / (2*(10**6)) + 1
 systemd.daemon.notify("STATUS=Opening owserver & DB connection...")
 try:
 	owproxy = proxy()
+except Exception as err:
+	print("Error connecting to owserver, sorry: {0}".format(err))
+	exit(1)
+
+try:
 	dbconn = psycopg2.connect("dbname=house_metrics")
 except Exception as err:
 	print("Error connecting to DB, sorry: {0}".format(err))
-	exit(1)
+	exit(2)
+
 cur = dbconn.cursor()
 cur.execute("PREPARE put_temperature AS INSERT INTO temperatures (datetime, sensor_id, value) VALUES (NOW(), (SELECT id FROM sensors WHERE SN=$1), $2);")
 
