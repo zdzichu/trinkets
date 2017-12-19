@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 #
 # (c) Tomasz Torcz, ISC License
+#
+# needs python2-pyxdg.noarch python2-mechanize python2-html5lib
 
 GRABLOG = "/home/zdzichu/.irssi/urllog"
 OUTPAGE = "/var/www/pipebreaker.pl/z/urls.html"
@@ -82,15 +84,15 @@ for line in grabbed_urls:
 	minutes = (seconds % 3600) // 60
 	seconds = (seconds % 60)
 
-	for period in ("days", "hours", "minutes"):
+	for period in ("days", "hours", "minutes", "seconds"):
 		count = locals()[period]
 		if count > 0:
-			ago = "%d %s" % (count, period)
+			ago = "%d %s ago" % (count, period)
 			break
 		else:
-			ago = "%d seconds" % seconds
+			ago = "just now"
 
-	outfile.write("<div>%s / <strong>%s</strong> %s ago &mdash; at %s\n" % (nick, channel, ago, time.ctime(int(timestamp)) ) )
+	outfile.write("<div>%s / <strong>%s</strong> %s &mdash; at %s\n" % (nick, channel, ago, time.ctime(int(timestamp)) ) )
 
 	(got_image, title) = get_title(url, cache)
 
