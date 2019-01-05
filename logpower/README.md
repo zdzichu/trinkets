@@ -26,7 +26,7 @@ WHERE
 
 `split_part()` is needed to strip '*kWh' added by some meters.
 
-Graphing current utilization can be dne with:
+Graphing current utilization can be done with:
 
 ```
 SELECT
