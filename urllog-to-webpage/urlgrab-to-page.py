@@ -44,6 +44,21 @@ class ShelveCache(URLCache):
 			return None
 
 
+class RedisCache(URLCache):
+	'''Store stuff one remote redis'''
+	def __init__(self):
+		import redis
+
+		self.cache = redis.StrictRedis(host='redis-urlcache.tau.pipebreaker.pl',
+			decode_responses=True)
+
+	def put(self, key, value):
+		self.cache.set(key, value)
+
+	def get(self, key):
+		return self.cache.get(key)
+
+
 # great, simple script got caching support
 # returns (is image, title)
 def get_title(url):
@@ -92,7 +107,8 @@ grablog.close()
 grabbed_urls.sort(reverse=True)
 
 # title cache
-cache = ShelveCache()
+#cache = ShelveCache()
+cache = RedisCache()
 
 outfile = open(OUTPAGE, "w")
 
