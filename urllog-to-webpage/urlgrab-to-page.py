@@ -10,7 +10,6 @@ OUTPAGE = "/var/www/pipebreaker.pl/z/urls.html"
 
 import datetime
 import os
-import shelve
 import time
 import xdg.BaseDirectory
 
@@ -20,9 +19,34 @@ sys.setdefaultencoding('utf8')
 
 from mechanize import Browser
 
+class URLCache:
+	'''Simple caching object.
+	   get, put, explicit close'''
+	cache = None
+
+class ShelveCache(URLCache):
+	'''Implement cache mechanism using shelve'''
+	def __init__(self):
+		import shelve
+		cache_file = os.path.join(xdg.BaseDirectory.get_runtime_dir(), "urlgrab-cache")
+		self.cache = shelve.open(cache_file)
+
+	def __del__(self):
+		self.cache.close()
+
+	def put(self, key, value):
+		self.cache[key] = value
+
+	def get(self, key):
+		if self.cache.has_key(key):
+			return self.cache[key]
+		else:
+			return None
+
+
 # great, simple script got caching support
 # returns (is image, title)
-def get_title(url, cache):
+def get_title(url):
 
 	got_image = False
 
@@ -34,7 +58,9 @@ def get_title(url, cache):
 			cache[url] = url
 			continue
 
-	if not cache.has_key(url):
+	title = cache.get(url)
+
+	if not title:
 		br = Browser()
 		try:
 			br.open(url)
@@ -42,15 +68,18 @@ def get_title(url, cache):
 			# teraz w sposób sprytny, bo facebook spierdolił linki do obrazków
 			if br.response().info()["Content-type"] in ["image/png", "image/jpeg", "image/gif", "image/svg+xml"]:
 				got_image = True
-				cache[url] = url
+				cache.put(url, url)
 			else:
-				cache[url] = br.title()
+				cache.put(url, br.title())
 		except Exception, e:
 			print "Problem, Sir - '%s' - with %s" % (e, url)
-			cache[url] = url
+			cache.put(url, url)
 		br.close()
 
-	return (got_image, cache[url])
+	# try again
+	title = cache.get(url)
+
+	return (got_image, title)
 
 
 # main() starts here
@@ -63,8 +92,7 @@ grablog.close()
 grabbed_urls.sort(reverse=True)
 
 # title cache
-cache_file = os.path.join(xdg.BaseDirectory.get_runtime_dir(), "urlgrab-cache")
-cache = shelve.open(cache_file)
+cache = ShelveCache()
 
 outfile = open(OUTPAGE, "w")
 
@@ -94,7 +122,7 @@ for line in grabbed_urls:
 
 	outfile.write("<div>%s / <strong>%s</strong> %s &mdash; at %s\n" % (nick, channel, ago, time.ctime(int(timestamp)) ) )
 
-	(got_image, title) = get_title(url, cache)
+	(got_image, title) = get_title(url)
 
 	# SFWize
 	if url.startswith("http://media.oboobs.ru/"):
@@ -114,7 +142,5 @@ for line in grabbed_urls:
 outfile.write("</body></html>")
 
 outfile.close();
-
-cache.close()
 
 print "Links made"
