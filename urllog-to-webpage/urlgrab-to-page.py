@@ -138,6 +138,10 @@ for line in grabbed_urls:
 
 	outfile.write("<div>%s / <strong>%s</strong> %s &mdash; at %s\n" % (nick, channel, ago, time.ctime(int(timestamp)) ) )
 
+	if days == 0 and hours < 8:
+		# prefetch today's links
+		outfile.write("<link rel='prefetch' href='%s'/>\n" % url)
+
 	(got_image, title) = get_title(url)
 
 	# SFWize
