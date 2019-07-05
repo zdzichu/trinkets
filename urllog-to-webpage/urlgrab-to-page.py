@@ -10,6 +10,7 @@ OUTPAGE = "/var/www/pipebreaker.pl/z/urls.html"
 
 import datetime
 import os
+import pickle
 import time
 import xdg.BaseDirectory
 
@@ -53,46 +54,44 @@ class RedisCache(URLCache):
 			decode_responses=True)
 
 	def put(self, key, value):
-		self.cache.set(key, value)
+		self.cache.set(key, pickle.dumps(value))
 
 	def get(self, key):
-		return self.cache.get(key)
+		return pickle.loads(self.cache.get(key))
 
 
 # great, simple script got caching support
 # returns (is image, title)
 def get_title(url):
 
-	got_image = False
-
 	# najpierw w sposob młotkowy
 	# nie trzeba sie łączyc, nie wpadnie na 403 albo robots.txt
 	for ext in ("jpg", "jpeg", "gif", "png", "svg", ":large"):
 		if url.lower().endswith(ext):
-			got_image = True
-			cache[url] = url
+			cache.put(url, (url, True))
 			continue
 
-	title = cache.get(url)
+	try:
+		(title, got_image) = cache.get(url)
 
-	if not title:
+	except TypeError:
+		# got None, key not in cache - open and get the title
 		br = Browser()
 		try:
 			br.open(url)
 
 			# teraz w sposób sprytny, bo facebook spierdolił linki do obrazków
 			if br.response().info()["Content-type"] in ["image/png", "image/jpeg", "image/gif", "image/svg+xml"]:
-				got_image = True
-				cache.put(url, url)
+				cache.put(url, (url, True))
 			else:
-				cache.put(url, br.title())
+				cache.put(url, (br.title(), False))
 		except Exception, e:
 			print "Problem, Sir - '%s' - with %s" % (e, url)
-			cache.put(url, url)
+			cache.put(url, (url, False))
 		br.close()
 
 	# try again
-	title = cache.get(url)
+	(title, got_image) = cache.get(url)
 
 	return (got_image, title)
 
