@@ -51,6 +51,7 @@ class RedisCache(URLCache):
 
 	def put(self, key, value):
 		self.cache.set(key, pickle.dumps(value))
+		self.cache.expire(key, datetime.timedelta(weeks=20))
 
 	def get(self, key):
 		return pickle.loads(self.cache.get(key))
