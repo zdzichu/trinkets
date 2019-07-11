@@ -8,15 +8,12 @@
 GRABLOG = "/home/zdzichu/.irssi/urllog"
 OUTPAGE = "/var/www/pipebreaker.pl/z/urls.html"
 
+import codecs
 import datetime
 import os
 import pickle
 import time
 import xdg.BaseDirectory
-
-import sys
-reload(sys)
-sys.setdefaultencoding('utf8')
 
 from mechanize import Browser
 
@@ -50,8 +47,7 @@ class RedisCache(URLCache):
 	def __init__(self):
 		import redis
 
-		self.cache = redis.StrictRedis(host='redis-urlcache.tau.pipebreaker.pl',
-			decode_responses=True)
+		self.cache = redis.StrictRedis(host='redis-urlcache.tau.pipebreaker.pl')
 
 	def put(self, key, value):
 		self.cache.set(key, pickle.dumps(value))
@@ -98,7 +94,7 @@ def get_title(url):
 
 # main() starts here
 
-grablog = open(GRABLOG)
+grablog = codecs.open(GRABLOG, 'r', encoding="utf-8")
 
 grabbed_urls = grablog.readlines()[-40:] # process last 40 links
 grablog.close()
@@ -109,7 +105,7 @@ grabbed_urls.sort(reverse=True)
 #cache = ShelveCache()
 cache = RedisCache()
 
-outfile = open(OUTPAGE, "w")
+outfile = codecs.open(OUTPAGE, "w", encoding="utf-8")
 
 outfile.write("<!DOCTYPE html>\n")
 outfile.write("<html><head><title>urlz for lulz: %s</title>\n" % datetime.datetime.now() )
@@ -154,7 +150,7 @@ for line in grabbed_urls:
 	if got_image:
 		outfile.write("</div>\n %s<br/> \n<img src='%s'>" % (url, url) )
 	else:
-		outfile.write("<h4><a href='%s'> → %s ←</a> <br/>\n%s </h4>\n</div>\n" % (url, title, ("" if title == url else url) ))
+		outfile.write(u"<h4><a href='%s'> → %s ←</a> <br/>\n%s </h4>\n</div>\n" % (url, title, ("" if title == url else url) ))
 
 	outfile.write(" <hr/>\n\n")
 
