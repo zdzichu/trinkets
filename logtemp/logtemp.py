@@ -31,14 +31,19 @@ cur.execute("PREPARE put_temperature AS INSERT INTO temperatures (datetime, sens
 systemd.daemon.notify("READY=1")
 systemd.daemon.notify("STATUS=Entering main loop")
 while True:
+	# trigger temperature read
+	owproxy.write('simultaneous/temperature', data=b'1')
+	# readout takes about 750ms, sleep a bit
+	time.sleep(1)
+
 	for owitem in owproxy.dir(slash=False):
 		if not owproxy.present("%s/temperature" % owitem):
-		    # not a temperature sensor, skip it
-		    continue
+			# not a temperature sensor, skip it
+			continue
 
 		SN = owitem[1:] # /slash be gone
 		systemd.daemon.notify("STATUS=Reading sensor %s..." % SN)
-		temperature = float(owproxy.read("%s/temperature" % owitem))
+		temperature = float(owproxy.read("%s/latesttemp" % owitem))
 
 		try:
 			cur.execute("EXECUTE put_temperature (%s, %s);", (SN, temperature) )
