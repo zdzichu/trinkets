@@ -1,0 +1,9 @@
+[Unit]
+Description=HDD fan PWM control
+
+[Service]
+Type=notify
+ExecStart=/usr/local/bin/fancontrol-hddtemp.sh
+
+[Install]
+WantedBy=fancontrol.service
