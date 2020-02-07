@@ -4,22 +4,40 @@
 # 38 -> 160
 
 DELAY=30
-DRIVES="ata-WDC_WD60EFRX-68MYMN0_WD-WX31D3408062 ata-WDC_WD60EFRX-68MYMN0_WD-WX31D3408253 ata-Samsung_SSD_850_PRO_256GB_S39KNX0J236503V"
-DRIVE_FAN="/sys/devices/platform/it87.2608/hwmon/hwmon1/pwm2"
+DRIVES_NAMES="ata-WDC_WD60EFRX-68MYMN0_WD-WX31D3408062 ata-WDC_WD60EFRX-68MYMN0_WD-WX31D3408253 ata-Samsung_SSD_850_PRO_256GB_S39KNX0J236503V"
+DRIVE_FAN="/sys/devices/platform/it87.2608/hwmon/[[:print:]]*/pwm2"
 MIN_PWM=20
 STEP_PWM=20
+
+# figure sensors names from drive names
+# udevadm returns something along:
+# /devices/pci0000:00/0000:00:1f.2/ata2/host1/target1:0:0/1:0:0:0/block/sdb
+for drive in $DRIVES_NAMES; do
+# get the DEVPATH, trim beginning of line, replace colons by minuses, leave ony first two
+	SCSI_TARGET_CHANNEL=$(udevadm info /dev/disk/by-id/${drive} | \
+	grep DEVPATH= | \
+	sed s/^.*target// | \
+	tr : - | \
+	cut --delimiter - --fields 1,2 )
+
+	DRIVES="${DRIVES} drivetemp-scsi-${SCSI_TARGET_CHANNEL}"
+done
+
 
 systemd-notify --ready
 
 echo "Controlling ${DRIVE_FAN}, every ${DELAY} seconds"
-echo "Drives: ${DRIVES}"
+echo "Drives: ${DRIVES_NAMES}" 
 
 while true; do
 	MAX_TEMP=30
 	# get temperatures
 	for drive in $DRIVES; do
-		temp=$(/usr/sbin/hddtemp -n /dev/disk/by-id/${drive})
-	#	echo MAX: $MAX_TEMP, temp: $temp
+		# output is  temp1_input: 36.000
+		# we need only decimal degrees (that's the resolution of SSD's sensor)
+		# NOTE: maybe investigate sensor's JSON output and jq
+		temp=$(/usr/bin/sensors --no-adapter -u ${drive} | grep _input | cut --delimiter : --fields 2 | cut --delimiter . --fields 1 )
+		#echo MAX: $MAX_TEMP, temp: $temp
 		MAX_TEMP=$(( MAX_TEMP > temp ? MAX_TEMP : temp))
 	done
 	#echo new MAX: $MAX_TEMP
