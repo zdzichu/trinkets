@@ -127,6 +127,9 @@ for line in grabbed_urls:
 	for period in ("days", "hours", "minutes", "seconds"):
 		count = locals()[period]
 		if count > 0:
+			if count == 1:
+				# strip plural 's'
+				period = period[:-1]
 			ago = "%d %s ago" % (count, period)
 			break
 		else:
