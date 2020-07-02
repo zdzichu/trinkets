@@ -15,6 +15,10 @@ import pickle
 import time
 import xdg.BaseDirectory
 
+#import sys
+#reload(sys)
+#sys.setdefaultencoding('utf8')
+
 from mechanize import Browser
 
 class URLCache:
@@ -33,11 +37,11 @@ class ShelveCache(URLCache):
 		self.cache.close()
 
 	def put(self, key, value):
-		self.cache[key] = value
+		self.cache[str(key)] = value
 
 	def get(self, key):
-		if self.cache.has_key(key):
-			return self.cache[key]
+		if self.cache.has_key(str(key)):
+			return self.cache[str(key)]
 		else:
 			return None
 
