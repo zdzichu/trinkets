@@ -3,7 +3,7 @@
 #
 # (c) Tomasz Torcz, ISC License
 #
-# needs python2-pyxdg.noarch python2-mechanize python2-html5lib
+# needs python3-pyxdg.noarch python3-mechanize python3-html5lib
 
 GRABLOG = "/home/zdzichu/.irssi/urllog"
 OUTPAGE = "/var/www/pipebreaker.pl/z/urls.html"
@@ -86,8 +86,8 @@ def get_title(url):
 				cache.put(url, (url, True))
 			else:
 				cache.put(url, (br.title(), False))
-		except Exception, e:
-			print "Problem, Sir - '%s' - with %s" % (e, url)
+		except Exception as exception:
+			print(f"Problem, Sir - '{exception}' - with {url}")
 			cache.put(url, (url, False))
 		br.close()
 
@@ -166,4 +166,4 @@ outfile.write("</body></html>")
 
 outfile.close();
 
-print "Links made"
+print("Links made")
