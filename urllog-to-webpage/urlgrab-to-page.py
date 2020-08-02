@@ -40,9 +40,9 @@ class ShelveCache(URLCache):
 		self.cache[str(key)] = value
 
 	def get(self, key):
-		if self.cache.has_key(str(key)):
+		try:
 			return self.cache[str(key)]
-		else:
+		except KeyError as error:
 			return None
 
 
@@ -87,7 +87,7 @@ def get_title(url):
 			else:
 				cache.put(url, (br.title(), False))
 		except Exception as exception:
-			print(f"Problem, Sir - '{exception}' - with {url}")
+			print(f"Problem, Sir - {exception} - with {url}")
 			cache.put(url, (url, False))
 		br.close()
 
