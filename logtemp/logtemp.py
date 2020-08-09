@@ -45,6 +45,10 @@ while True:
 		systemd.daemon.notify("STATUS=Reading sensor %s..." % SN)
 		temperature = float(owproxy.read("%s/latesttemp" % owitem))
 
+		if temperature == 85.000:
+			# magic value indicating sensor error, do not log it
+			continue
+		    
 		try:
 			cur.execute("EXECUTE put_temperature (%s, %s);", (SN, temperature) )
 		except psycopg2.IntegrityError:
