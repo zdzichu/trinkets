@@ -7,6 +7,7 @@ import os
 import psycopg2
 import systemd.daemon
 import time
+from timeit import default_timer
 
 from pyownet.protocol import proxy
 
@@ -36,6 +37,8 @@ while True:
 	# readout takes about 750ms, sleep a bit
 	time.sleep(1)
 
+	nr_read = 0
+	read_start = default_timer()
 	for owitem in owproxy.dir(slash=False):
 		if not owproxy.present("%s/temperature" % owitem):
 			# not a temperature sensor, skip it
@@ -44,6 +47,7 @@ while True:
 		SN = owitem[1:] # /slash be gone
 		systemd.daemon.notify("STATUS=Reading sensor %s..." % SN)
 		temperature = float(owproxy.read("%s/latesttemp" % owitem))
+		nr_read += 1
 
 		if temperature == 85.000:
 			# magic value indicating sensor error, do not log it
@@ -58,8 +62,11 @@ while True:
 			dbconn.commit()
 			cur.execute("EXECUTE put_temperature (%s, %s);", (SN, temperature) )
 
+	read_end = default_timer()
+        
 	dbconn.commit()
-	systemd.daemon.notify("STATUS=Sleeping until %s" % time.ctime(time.time() + sleep_seconds))
+	systemd.daemon.notify("STATUS=Read %d sensors in %.3f seconds. Sleeping until %s" % 
+		(nr_read, read_end - read_start, time.ctime(time.time() + sleep_seconds)) )
 	systemd.daemon.notify("WATCHDOG=1")
 	time.sleep(sleep_seconds)
 
