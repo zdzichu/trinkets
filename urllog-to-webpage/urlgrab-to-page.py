@@ -113,7 +113,7 @@ cache = RedisCache()
 outfile = codecs.open(OUTPAGE, "w", encoding="utf-8")
 
 outfile.write("<!DOCTYPE html>\n")
-outfile.write("<html><head><title>urlz for lulz: %s</title>\n" % datetime.datetime.now() )
+outfile.write("<html><head><title>urlz for lulz: %s</title>\n" % datetime.datetime.now().astimezone().isoformat(timespec='minutes') )
 outfile.write("<meta charset='utf-8'><meta http-equiv='refresh' content='300' ></head>\n")
 outfile.write("<body style=\"font-family: Cantarell\">\n")
 
@@ -139,7 +139,7 @@ for line in grabbed_urls:
 		else:
 			ago = "just now"
 
-	outfile.write("<div>%s / <strong>%s</strong> %s &mdash; at %s\n" % (nick, channel, ago, time.ctime(int(timestamp)) ) )
+	outfile.write("<div>%s / <strong>%s</strong> %s &mdash; at %s %s\n" % (nick, channel, ago, time.ctime(int(timestamp)), time.strftime("%Z") ) )
 
 	if days == 0 and hours < 8:
 		# prefetch today's links
