@@ -1,0 +1,11 @@
+[Unit]
+Description=SMART data collector
+
+[Timer]
+OnBootSec=12h
+OnUnitActiveSec=1d
+AccuracySec=12h
+
+[Install]
+WantedBy=multi-user.target
+

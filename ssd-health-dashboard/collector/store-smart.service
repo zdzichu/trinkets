@@ -1,0 +1,8 @@
+[Unit]
+Description=SMART data collector
+
+[Service]
+Environment=R_HOST=your.redis.instance
+Environment=R_PORT=6379
+ExecStart=/usr/local/bin/store-smart.sh
+Type=simple
