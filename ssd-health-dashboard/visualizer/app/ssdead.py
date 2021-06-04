@@ -72,6 +72,7 @@ def main():
             "drive": drive,
             "percentage_used": percentage_used,
             "dead_on": dead_time.strftime('%B %Y'),
+            "temperature": temperature,
             "key_ttl": cache.ttl(key)
             })
 

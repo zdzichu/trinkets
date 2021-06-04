@@ -3,20 +3,31 @@
   <title>SSDeaDashboard</title>
 
   <link href="https://pipebreaker.pl/z/kanboard-dark.css" media="all" rel="stylesheet" type="text/css"/>
+  <style>
+    body { font-family: sans-serif }
+    table, td { padding: 5px }
+    .minor { color: #909090 }
+  </style>
  </head>
 
 <body>
 <center>
 <br/>
 <p>
+<table>
 {% for host in hosts_drives %}
-  <h3>{{ host }}</h3>
+  <tr><th colspan="3" align="left">{{ host }}</th></tr>
   {% for drive in hosts_drives[host] %}
-  <p>{{ drive.model_name }} will live until {{ drive.dead_on }}</p>
+  <tr>
+	  <td>{{ drive.model_name }}<br/>
+		  <span class="minor">{{ drive.drive }} 🌡️{{ drive.temperature }}°C</span></td>
+	  <td><img src="https://enotty.pipebreaker.pl/files/bar.png" height="16" width="{{ drive.percentage_used }}%"> {{ drive.percentage_used }}% </td>
+	  <td>will live until {{ drive.dead_on }}😵</td>
+  </tr>
   {% endfor %}
 {% endfor %}
+</table>
 </p>
-
 
 </center>
 </body>
