@@ -44,7 +44,7 @@ def main():
 
             for attr in smart_data["ata_smart_attributes"]["table"]:
                 if attr["name"] == "Wear_Leveling_Count":
-                    percentage_used = int(attr["value"])
+                    percentage_used = 100 - int(attr["value"])
                 elif attr["name"] == "Workld_Media_Wear_Indic":
                     # this is for intel, but maybe look at Media_Wearout_Indicator ?
                     percentage_used = int(attr["value"]) / 1024
