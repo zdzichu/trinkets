@@ -1,0 +1,17 @@
+FROM fedora:latest
+
+# workaround for running yum in container
+USER root
+
+RUN dnf install --assumeyes \
+	python3-flask \
+	python3-redis \
+	&& dnf clean all
+
+USER 1000
+
+ADD /app /app
+
+WORKDIR /app
+
+CMD [ "/app/ssdead.py" ]

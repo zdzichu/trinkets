@@ -1,0 +1,22 @@
+<html>
+ <head>
+  <title>SSDeaDashboard</title>
+
+  <link href="https://pipebreaker.pl/z/kanboard-dark.css" media="all" rel="stylesheet" type="text/css"/>
+ </head>
+
+<body>
+<center>
+<br/>
+<p>
+{% for host in hosts_drives %}
+  <h3>{{ host }}</h3>
+  {% for drive in hosts_drives[host] %}
+  <p>{{ drive.model_name }} will live until {{ drive.dead_on }}</p>
+  {% endfor %}
+{% endfor %}
+</p>
+
+
+</center>
+</body>
