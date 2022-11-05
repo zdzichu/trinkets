@@ -1,0 +1,10 @@
+[Unit]
+Description=store media meters in the database
+
+[Service]
+Type=notify
+Environment=PYTHONUNBUFFERED=true
+ExecStart=/home/poligon/sources/github/zdz/trinkets/logmeters/logmeters.py
+StandardOutput=journal
+StandardError=journal
+

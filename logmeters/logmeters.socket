@@ -1,0 +1,8 @@
+[Unit]
+Description=pipe for logmeters
+
+[Socket]
+ListenFIFO=/run/user/1001/logmeters.socket
+
+[Install]
+WantedBy=default.target
