@@ -29,6 +29,8 @@ except Exception as err:
 cur = dbconn.cursor()
 cur.execute("PREPARE put_temperature AS INSERT INTO temperatures (datetime, sensor_id, value) VALUES (NOW(), (SELECT id FROM sensors WHERE SN=$1), $2);")
 
+meter_cache = {}
+
 systemd.daemon.notify("READY=1")
 systemd.daemon.notify("STATUS=Entering main loop")
 while True:
@@ -52,7 +54,18 @@ while True:
 		if temperature == 85.000:
 			# magic value indicating sensor error, do not log it
 			continue
-		    
+
+		try:
+			if temperature == meter_cache[SN]:
+				# the same value as previous read, do not log
+				continue
+		except KeyError as e:
+			# no data in cache, do nothing
+			pass
+
+		# update cache
+		meter_cache[SN] = temperature
+
 		try:
 			cur.execute("EXECUTE put_temperature (%s, %s);", (SN, temperature) )
 		except psycopg2.IntegrityError:
@@ -63,7 +76,7 @@ while True:
 			cur.execute("EXECUTE put_temperature (%s, %s);", (SN, temperature) )
 
 	read_end = default_timer()
-        
+
 	dbconn.commit()
 	systemd.daemon.notify("STATUS=Read %d sensors in %.3f seconds. Sleeping until %s" % 
 		(nr_read, read_end - read_start, time.ctime(time.time() + sleep_seconds)) )
