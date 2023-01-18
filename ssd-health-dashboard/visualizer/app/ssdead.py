@@ -45,9 +45,11 @@ def main():
             for attr in smart_data["ata_smart_attributes"]["table"]:
                 if attr["name"] == "Wear_Leveling_Count":
                     percentage_used = 100 - int(attr["value"])
-                elif attr["name"] == "Workld_Media_Wear_Indic":
-                    # this is for intel, but maybe look at Media_Wearout_Indicator ?
-                    percentage_used = int(attr["value"]) / 1024
+                elif attr["name"] == "Media_Wearout_Indicator":
+                    percentage_used = int(attr["value"])
+#                elif attr["name"] == "Workld_Media_Wear_Indic":
+#                    # this is for intel, but maybe look at Media_Wearout_Indicator ?
+#                    percentage_used = int(attr["value"]) / 1024
         else:
             print("wtf")
 
@@ -62,7 +64,7 @@ def main():
         percent_per_hour = power_on_hours / percentage_used
         percent_left = 100 - percentage_used
         hours_left = percent_left * percent_per_hour
-
+        print(f"drv {model_name} left pct {percent_left} left h {hours_left} pct-per-hour {percent_per_hour} uptime {power_on_hours}")
         dead_time = datetime.datetime.now() + datetime.timedelta(hours=hours_left)
 
         if not host in hosts_drives:
@@ -79,6 +81,6 @@ def main():
     return render_template("main.html", hosts_drives=hosts_drives)
 
 if __name__ == "__main__":
-    app.run(host='::')
+    app.run(host='::', port=7770)
 
 
