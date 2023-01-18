@@ -17,7 +17,7 @@ def main():
     cache = redis.StrictRedis(host=os.getenv("R_HOST"), port=os.getenv("R_PORT"),
             charset="utf-8", decode_responses=True)
 
-    for key in cache.keys("ssdead/*"):
+    for key in sorted(cache.keys("ssdead/*")):
         _, host, drive = key.split("/")
 
         smart_data = json.loads(cache.get(key))
