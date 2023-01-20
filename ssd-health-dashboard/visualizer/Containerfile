@@ -6,6 +6,7 @@ USER root
 RUN dnf install --assumeyes \
 	python3-flask \
 	python3-redis \
+	python3-humanize \
 	&& dnf clean all
 
 USER 1000
