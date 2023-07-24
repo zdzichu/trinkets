@@ -1,0 +1,47 @@
+---
+kind: DaemonSet
+apiVersion: apps/v1
+metadata:
+  name: k3s-cleanup
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: "k3s-cleanup"
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: "k3s-cleanup"
+      annotations:
+        kubectl.kubernetes.io/default-container: "k3s-cleanup"
+    spec:
+      volumes:
+      - name: rancherk3s
+        hostPath:
+          path: /var/lib/rancher/k3s/data
+      containers:
+      - name: k3s-cleanup
+        volumeMounts:
+        - name: rancherk3s
+          mountPath: /var/lib/rancher/k3s/data
+        image: busybox
+        command: [ "/bin/sh", "-c" ]
+        args:
+        - export CLEANUPROOT=/var/lib/rancher/k3s/data;
+          cd ${CLEANUPROOT};
+          while true; do
+            echo "$(date -Iseconds) Starting k3s cleanup of ${CLEANUPROOT}";
+            for subdir in $(find ${CLEANUPROOT}  -mindepth 1  -maxdepth 1 -type d); do
+              if [ $(readlink ${CLEANUPROOT}/current) == ${subdir} ]; then
+                echo ✅ Skipping ${subdir} - it is current k3s data;
+                continue;
+              elif [ $(readlink ${CLEANUPROOT}/previous) == ${subdir} ]; then
+                echo ✅ Skipping ${subdir} - it is previous k3s data;
+                continue;
+              fi;
+              echo 🗑️ Removing ${subdir};
+              rm -r ${subdir};
+            done;
+            echo "$(date -Iseconds) Sleeping for a week";
+            sleep 7d;
+          done
+

@@ -3,6 +3,9 @@ trinkets
 
 miscellaneous items
 
+* k3s-cleanup
+  Remove stale date left by k3s upgrades
+
 * logmeters
   Store WMBUS meter reading in the database;
 
