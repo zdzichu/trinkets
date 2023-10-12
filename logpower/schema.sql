@@ -27,7 +27,7 @@ CREATE INDEX idx_pmi_mid ON power_measurements_items(pmi_measurement_id);
 -- create delta (in Watts) view for 1.8.0*00  (01,02 are historical values)
 -- m2 - current measurement, m1 - previous measurement
 CREATE VIEW v_power_delta AS SELECT m2.m_datetime, '1.8.0*00' AS field,
-	( (split_part(pmi2.pmi_data, '*', 1)::float - split_part(pmi1.pmi_data, '*', 1)::float) / (EXTRACT(EPOCH FROM m2.m_datetime) - EXTRACT(EPOCH FROM m1.m_datetime)) ) * 1000 AS delta
+	( (split_part(pmi2.pmi_data, '*', 1)::float - split_part(pmi1.pmi_data, '*', 1)::float) / (EXTRACT(EPOCH FROM m2.m_datetime) - EXTRACT(EPOCH FROM m1.m_datetime)) ) * 3600 AS delta
 	FROM power_measurements_items AS pmi1, power_measurements_items AS pmi2, measurements AS m1, measurements AS m2
 	-- find previous measurements and its items
 	WHERE m1.m_id = (SELECT m_id FROM measurements WHERE m_id < m2.m_id ORDER BY m_datetime DESC LIMIT 1)
