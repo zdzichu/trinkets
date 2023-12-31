@@ -1,0 +1,19 @@
+FROM fedora-minimal:latest
+
+## workaround for running yum in container
+#USER root
+
+RUN microdnf install --assumeyes \
+	python3-paho-mqtt \
+	python3-humanize \
+	tzdata \
+	&& microdnf clean all
+
+USER 1000
+
+ADD /app /app
+
+WORKDIR /app
+
+CMD [ "/app/candy-mqtt.py" ]
+
