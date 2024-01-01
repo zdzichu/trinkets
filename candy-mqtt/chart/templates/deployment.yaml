@@ -1,0 +1,45 @@
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+    app.kubernetes.io/name: {{ .Release.Name }}
+    app.kubernetes.io/version: {{ .Chart.AppVersion | default "latest" | quote }}
+spec:
+  replicas: 2
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ .Release.Name }}
+      annotations:
+        kubectl.kubernetes.io/default-container: candy-mqtt
+        a8r.io/repository: "https://github.com/zdzichu/trinkets/candy-mqtt"
+
+    spec:
+      securityContext:
+        runAsUser: 1335
+      containers:
+      - name: candy-mqtt
+        image: pipebreaker.pl:5000/candy-mqtt:{{ .Chart.AppVersion | default "latest" | quote }}
+        envFrom:
+          - configMapRef:
+              name: {{ .Release.Name }}
+          - secretRef:
+              name: {{ .Release.Name }}
+        resources:
+          requests:
+            cpu: 50m
+            memory: 100Mi
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: {{ .Release.Name }}
+

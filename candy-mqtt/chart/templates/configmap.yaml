@@ -1,0 +1,11 @@
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ .Release.Name }}
+data:
+  CANDY_HOST: {{ .Values.candyHost | quote }}
+  MQTT_HOST: {{ .Values.mqttHost | quote }}
+  MQTT_USER: {{ .Values.mqttUser | quote }}
+  MQTT_TOPIC: {{ .Values.mqttTopic | quote }}
+

@@ -1,0 +1,13 @@
+
+# appliance hostname/IP address
+candyHost: 192.0.2.1
+
+# broker address
+mqttHost: example.com
+
+# broker user
+mqttUser: example
+
+# topic beginning
+mqttTopic: "/agd"
+
