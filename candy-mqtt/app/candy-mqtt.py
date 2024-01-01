@@ -1,4 +1,7 @@
 #!/usr/bin/python
+#
+# Query a Candy appliance and publish status to MQTT
+#
 
 import datetime as dt
 import json
@@ -56,7 +59,7 @@ while True:
         candy_json = get_candy_json(candy_host, candy_key)
     except urllib.error.URLError as e:
         logging.debug(f"Connection to {candy_host} failed: {e}")
-        # hack - send false report to indicate dyer is not on
+        # hack - send false report to indicate dyer is off
         mqttc.publish("/agd/statusTD/RemTime", 0)
 
         current_sleep_s = min(current_sleep_s * 2, max_sleep_s)
