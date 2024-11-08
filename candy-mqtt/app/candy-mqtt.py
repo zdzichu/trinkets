@@ -60,7 +60,7 @@ while True:
     except urllib.error.URLError as e:
         logging.debug(f"Connection to {candy_host} failed: {e}")
         # hack - send false report to indicate dyer is off
-        mqtcc.publish("/agd/statusTD/StatoTD", 0)
+        mqttc.publish("/agd/statusTD/StatoTD", 0)
         # hack2 - and pretend doors are open
         mqttc.publish("/agd/statusTD/DoorState", 0)
         mqttc.publish("/agd/statusTD/RemTime", 0)
