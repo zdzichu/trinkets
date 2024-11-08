@@ -75,11 +75,13 @@ while True:
 
     json_key = list(candy_json.keys())[0] # should discriminate type of hardware, e.g. 'statusTD' for tumble-dryer
 
+    published = 0
     for status_item in candy_json[json_key]:
         status_value = candy_json[json_key][status_item]
         logging.debug(f"Publishing {mqtt_topic}/{json_key}/{status_item} = {status_value}")
         mqttc.publish(f"{mqtt_topic}/{json_key}/{status_item}", status_value)
+        published += 1
 
-    logging.info(f"Published OK, sleeping for {nice_time(sleep_s)}")
+    logging.info(f"Published {published} items OK, sleeping for {nice_time(sleep_s)}")
     time.sleep(sleep_s)
 
