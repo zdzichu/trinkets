@@ -22,7 +22,11 @@
   <tr>
 	  <td>{{ drive.model_name }}<br/>
 		  <span class="minor">{{ drive.drive }} 🌡️{{ drive.temperature }}°C</span></td>
+	  {% if progress %}
+	  <td width="25%"><progress max="100" value="{{ drive.percentage_used }}" title="Written: {{ drive.written }}">{{ drive.percentage_used }}%</progress></td>
+	  {% else %}
 	  <td width="25%"><div class="progress" style="width: {{ drive.percentage_used }}%" title="Written: {{ drive.written }}"> {{ drive.percentage_used }}% </div></td>
+	  {% endif %}
 	  <td>will live until {{ drive.dead_on }}😵</td>
   </tr>
   {% endfor %}

@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 import datetime
 import json
 import humanize
@@ -94,10 +94,10 @@ def main():
             "dead_on": dead_time.strftime('%B %Y'),
             "written": humanize.naturalsize(data_written, binary=False),    # manufacturers use power-of-10 sizes
             "temperature": temperature,
-            "key_ttl": cache.ttl(key)
+            "key_ttl": cache.ttl(key),
             })
 
-    return render_template("main.html", hosts_drives=hosts_drives)
+    return render_template("main.html", hosts_drives=hosts_drives, progress=request.args.get("progress"))
 
 if __name__ == "__main__":
 #    app.run(host='::', port=7770)
